@@ -1,4 +1,5 @@
 import smtplib
+from imap_tools import MailBox, AND
 
 #to compile the emails properly 
 from email.mime.multipart import MIMEMultipart
@@ -112,23 +113,39 @@ def newEmail(question, email):
     print(s)
     print(b)
 
-#returns logged in session for monitoring
-def loginEmail():
-    pass
+#monitoring the email
+def getEmails():
+    #sign in
+    mailbox = MailBox('imap.gmail.com')
+    mailbox.login(senderEmailAddress, senderEmailPassword, initial_folder='INBOX')
 
-def monitorEmail():
-    pass
+    #get the new email that has not been read, set to read
+    newEmails = mailbox.fetch(criteria=AND(seen=False), mark_seen=True)
+    
+    #get sender, subject, and body of email
+    for newEmail in newEmails:
+        userEmail = newEmail.from_
+        subject = newEmail.subject
+        body = newEmail.text
+        return userEmail, subject, body
+    mailbox.logout()
+
+    return 0,0,0
+
+    
+    
+
 
 def main():
     
-    #to initally get logged in to the email
-    loggedIn = loginEmail()
+   #read unread emails
+    email, subject, body = getEmails()
 
-    #can put in question and email
-    question = ""
-    email = ""
+    #send email
+    newEmail(subject, email)
 
-    newEmail(question, email)
+
+    
     
     
     
