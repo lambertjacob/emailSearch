@@ -29,8 +29,6 @@ class website:
         self.link = link
         self.name = name
 
-
-
 #try to send the email back to the user when the data has been recieved
 def sendEmail(s, b, email):
     try:   
@@ -73,7 +71,6 @@ def searchQuestion(url):
     time.sleep(1) #to have a delay to not make google angry
     names = websession.find_elements(By.XPATH,'//div[@class=\'yuRUbf\']//h3')
 
-
     #make a class for the number of links on the first page and store in a list
     websites = list()
         
@@ -113,6 +110,7 @@ def newEmail(question, email):
     print(s)
     print(b)
 
+
 #monitoring the email
 def getEmails():
     #sign in
@@ -121,34 +119,38 @@ def getEmails():
 
     #get the new email that has not been read, set to read
     newEmails = mailbox.fetch(criteria=AND(seen=False), mark_seen=True)
+
+    #if there are no new emails
+    if not newEmails:
+        mailbox.logout()
+        return 0,0,0
     
     #get sender, subject, and body of email
     for newEmail in newEmails:
         userEmail = newEmail.from_
-        subject = newEmail.subject
-        body = newEmail.text
-        return userEmail, subject, body
-    mailbox.logout()
-
+        subjectSent = newEmail.subject
+        bodySent = newEmail.text
+        mailbox.logout()
+        return userEmail, subjectSent, bodySent
+    
     return 0,0,0
-
     
-    
-
 
 def main():
     
-   #read unread emails
-    email, subject, body = getEmails()
+    #repeat to take multiple reuwats
+    while(1):
+        #read unread emails
+        email, subject, body = getEmails()
 
-    #send email
-    newEmail(subject, email)
+        #if there actually was an email
+        if email != 0:
+            #send email
+            newEmail(subject, email)
 
+        #check inbox after 5 seconds
+        time.sleep(5)
 
-    
-    
-    
-    
 
 if __name__ == "__main__":
     main()
